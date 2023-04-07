@@ -13,5 +13,8 @@ app.use(express.json())
 //will solve many issues when trying to make that api request from the front end
 app.use(cors())
 
+//connecting with mongoose
+mongoose.connect("mongodb+srv://chrisleosteve:thriveDXproject@recipes.ndyizjb.mongodb.net/recipes?retryWrites=true&w=majority")
+
 //tells our api to start
 app.listen(3001, () => console.log("SERVER STARTED!"))
