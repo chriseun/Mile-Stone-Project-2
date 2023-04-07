@@ -6,12 +6,18 @@ import cors from 'cors'
 //for mongodb
 import mongoose from 'mongoose'
 
+import { userRouter } from './routes/users.js'
+
 
 const app = express()
 //when getting data from front end, will translate to json
 app.use(express.json())
 //will solve many issues when trying to make that api request from the front end
 app.use(cors())
+
+//seperating our code to './routes/users.js'
+//whatever endpoints we use from users.js, we start with /auth route
+app.use("/auth", userRouter);
 
 //connecting with mongoose
 mongoose.connect("mongodb+srv://chrisleosteve:thriveDXproject@recipes.ndyizjb.mongodb.net/recipes?retryWrites=true&w=majority")
