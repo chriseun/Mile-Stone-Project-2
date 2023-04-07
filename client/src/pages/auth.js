@@ -13,3 +13,4 @@ export const Auth = () => {
     </div>
   );
 };
+
