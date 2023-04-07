@@ -1,5 +1,7 @@
 //this file will encompass everything to logging-in and registering
 import express from 'express'
+//jwt is used for authorization- authorizing this user has access to this system with its own secret key
+//with the jwt,, the user information is stored inside the jwt instead of being stored in the server
 import jwt from 'jsonwebtoken'
 import bcrypt from 'bcrypt'
 import { UserModel } from '../models/Users.js'
@@ -40,7 +42,34 @@ router.post("/register", async(req, res) => {
 
 
 //login route
-router.post("/login")
+router.post("/login", async (req, res) =>{
+  //when you login, you will need a user name and a password
+   const { username, password } = req.body
+  //we will try to find a user this username below
+   const user = await UserModel.findOne({ username });
+
+   //if the username is NOT in the registry
+   if (!user){
+    return res.json({message: "User Doesn't Exist!"})
+   }
+
+   //we will use bcrypt to determine this
+   //you cannot actually UN-hash a password that has already been hashed
+   //we are comparing with the hashed password
+   const isPasswordValid = await bcrypt.compare(password, user.password)
+
+   //if the password does not match the hashed password
+   if (!isPasswordValid) {
+    return res.json({message: "Username or Password is Incorrect!"})
+   }
+
+   //if the username and password valid
+   //how we create web tokens
+   const token = jwt.sign({id: user._id}, "secret");
+
+
+})
+//the token will prove that they are the already authenticated users
 
 
 
