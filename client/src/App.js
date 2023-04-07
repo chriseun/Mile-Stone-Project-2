@@ -4,7 +4,7 @@ import { Home } from './pages/home' ;
 import { Auth } from './pages/auth';
 import { CreateRecipe } from './pages/create-recipe';
 import { SavedRecipes } from './pages/saved-recipes';
-//import { Navbar } from './components/navbar';
+import { Navbar } from './components/navbar';
 
 function App() {
   return (
