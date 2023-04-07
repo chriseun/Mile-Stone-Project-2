@@ -63,13 +63,16 @@ router.post("/login", async (req, res) =>{
     return res.json({message: "Username or Password is Incorrect!"})
    }
 
-   //if the username and password valid
-   //how we create web tokens
-   const token = jwt.sign({id: user._id}, "secret");
-   res.json({token, userID: user._id})
+ //if the username and password valid
 
+    //the token will prove that they are the already authenticated users
+   //how we create web tokens using json web tokens jwt
+   //secret for our tokens
+   const token = jwt.sign({id: user._id}, "secret");
+   //we put it in userID so we can store it in our project
+   res.json({token, userID: user._id})
 })
-//the token will prove that they are the already authenticated users
+
 
 
 
