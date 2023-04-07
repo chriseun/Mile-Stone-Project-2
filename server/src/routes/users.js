@@ -19,8 +19,23 @@ router.post("/register", async(req, res) => {
   //.then .catch or async await
   const user = await UserModel.findOne({ username });
 
+  //if user is already inside the database from registering
+  if (user) {
+    //we are returning that user already exists
+    return res.json({message: "User already exists!"});
+  }
+
+  //creating a password that is hashed for less probabilty of password leakage
+  const hashedPassword = await bcrypt.hash(password, 10)
+
+  //we want to add the user to our database with the new hashed password
+  const newUser = new UserModel({username, password: hashedPassword})
+  //this will create a new user
+  await newUser.save()
+
   //we are going to send back a json
-  res.json(user)
+  //new user created!
+  res.json({message: "User Registerd Successfully!"})
 })
 
 
