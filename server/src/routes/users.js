@@ -64,9 +64,11 @@ router.post("/login", async (req, res) =>{
    }
 
    //if the username and password valid
-   //how we create web tokens
+   //how we create web tokens using json web tokens jwt
+   //secret for our tokens
    const token = jwt.sign({id: user._id}, "secret");
-
+   //we put it in userID so we can store it in our project
+   res.json({token, userID: user._id})
 
 })
 //the token will prove that they are the already authenticated users
