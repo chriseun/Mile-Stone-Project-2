@@ -1,81 +1,68 @@
-//this file will encompass everything to logging-in and registering
-import express from 'express'
-//jwt is used for authorization- authorizing this user has access to this system with its own secret key
-//with the jwt,, the user information is stored inside the jwt instead of being stored in the server
-import jwt from 'jsonwebtoken'
-import bcrypt from 'bcrypt'
-import { UserModel } from '../models/Users.js'
+//logging and registering
+import express from 'express';
+import jwt from 'jsonwebtoken';
+//to make passwords complicated
+import bcrypt from 'bcrypt';
+import { UserModel } from '../models/Users.js';
 
+const router = express.Router();
 
-const router = express.Router()
-
-//register route
-router.post("/register", async(req, res) => {
-  //this is the body of the request
-  const { username, password } = req.body
-
-  //UserModel from './models.User.js'
-  //we are making a request to UserModel
-  //findOne() = function that is calling one user
-  //'username: username' = username
-  //.then .catch or async await
+//req is getting data from request res is to send data back to the request
+router.post("/register", async (req, res) => {
+  const { username, password } = req.body;
+  //same as { username : username }
   const user = await UserModel.findOne({ username });
 
-  //if user is already inside the database from registering
+  //if existing username registering
   if (user) {
-    //we are returning that user already exists
-    return res.json({message: "User already exists!"});
+    return res.json({ message: "User already exists!" });
   }
 
-  //creating a password that is hashed for less probabilty of password leakage
-  const hashedPassword = await bcrypt.hash(password, 10)
+  //using passwords not too common
+  const hashedPassword = await bcrypt.hash(password, 10);
 
-  //we want to add the user to our database with the new hashed password
-  const newUser = new UserModel({username, password: hashedPassword})
-  //this will create a new user
-  await newUser.save()
+  const newUser = new UserModel({ username, password: hashedPassword });
+  await newUser.save();
 
-  //we are going to send back a json
-  //new user created!
-  res.json({message: "User Registerd Successfully!"})
-})
+  //response by sending through json by user
+  res.json({ message: "User Registered Successfully" });
+});
 
-
-//login route
 router.post("/login", async (req, res) =>{
-  //when you login, you will need a user name and a password
-   const { username, password } = req.body
-  //we will try to find a user this username below
-   const user = await UserModel.findOne({ username });
+  const { username, password } = req.body;
+  const user = await UserModel.findOne({ username });
 
-   //if the username is NOT in the registry
-   if (!user){
-    return res.json({message: "User Doesn't Exist!"})
-   }
+  //if username is not registered
+  if (!user) {
+    return res.json({message: "User Doesn't Exist!"});
+  }
+  //algorithm with hashing will return the same value
+  //comparing the password with the original password from the database
+  const isPasswordValid = await bcrypt.compare(password, user.password);
 
-   //we will use bcrypt to determine this
-   //you cannot actually UN-hash a password that has already been hashed
-   //we are comparing with the hashed password
-   const isPasswordValid = await bcrypt.compare(password, user.password)
+  if(!isPasswordValid) {
+    return res.json({message: "Username or Password Is Incorrect!"})
+  }
 
-   //if the password does not match the hashed password
-   if (!isPasswordValid) {
-    return res.json({message: "Username or Password is Incorrect!"})
-   }
-
- //if the username and password valid
-
-    //the token will prove that they are the already authenticated users
-   //how we create web tokens using json web tokens jwt
-   //secret for our tokens
-   const token = jwt.sign({id: user._id}, "secret");
-   //we put it in userID so we can store it in our project
-   res.json({token, userID: user._id})
+  const token = jwt.sign({id: user._id}, "secret");
+  res.json({token, userID: user._id});
 })
 
-
-
-
-
-//we will have more than one router so we name it userRouter
+//we wil have more than one router
 export { router as userRouter };
+
+//middleware
+//next will authorize the request to continue
+export const verifyToken = (req, res, next) => {
+  const token = req.headers.authorization;
+  if (token) {
+    //same 'secret on line 47
+    jwt.verify(token, "secret", (err) =>{
+      //forbidden response - not authorized
+      if (err) return res.sendStatus(403);
+      next();
+    })
+  } else {
+    res.sendStatus(401);
+  }
+}
