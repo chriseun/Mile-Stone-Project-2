@@ -1,6 +1,6 @@
 # Mile-stone-project-2
 Creating a Recipe App using mongodb 
-Live Site: chrisleosteverecipe.com
+Live Site: http://chrisleosteverecipe.com
 Code contributers: Leonardo Garcia, Stephen Pak, Christopher Eun
 references: 
 Author: Pedro from Pedro Tech, 2022
